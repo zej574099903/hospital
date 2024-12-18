@@ -43,21 +43,17 @@ const modules: Record<string, any> = import.meta.glob(
 );
 
 /** 原始静态路由（未做任何处理） */
-const routes = [];
-
-Object.keys(modules).forEach(key => {
-  routes.push(modules[key].default);
-});
+const routes = Object.keys(modules).map(key => modules[key].default);
 
 /** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */
 export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
-  formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
+  formatFlatteningRoutes(buildHierarchyTree(ascending(routes)))
 );
 
 /** 用于渲染菜单，保持原始层级 */
-export const constantMenus: Array<RouteComponent> = ascending(
-  routes.flat(Infinity)
-).concat(...remainingRouter);
+export const constantMenus: Array<RouteComponent> = ascending(routes).concat(
+  ...remainingRouter
+);
 
 /** 不参与菜单的路由 */
 export const remainingPaths = Object.keys(remainingRouter).map(v => {
@@ -92,7 +88,7 @@ export function resetRouter() {
       router.removeRoute(name);
       router.options.routes = formatTwoStageRoutes(
         formatFlatteningRoutes(
-          buildHierarchyTree(ascending(routes.flat(Infinity)))
+          buildHierarchyTree(ascending(routes))
         )
       );
     }
