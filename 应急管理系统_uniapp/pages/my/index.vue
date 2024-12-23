@@ -27,22 +27,16 @@
   </view>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      userInfo: {
-        name: '张医生',
-        gender: '男',
-        role: '主治医师',
-        hospital: '杭州市第二人民医院',
-        department: '急诊科'
-      }
-    }
-  },
-  methods: {
-  }
-}
+<script setup>
+import { ref } from 'vue'
+
+const userInfo = ref({
+  name: '张医生',
+  gender: '男',
+  role: '主治医师',
+  hospital: '杭州市第二人民医院',
+  department: '急诊科'
+})
 </script>
 
 <style lang="scss">
