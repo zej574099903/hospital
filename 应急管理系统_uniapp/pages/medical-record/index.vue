@@ -235,6 +235,7 @@
 import { ref, onMounted } from 'vue'
 
 // 患者信息
+const patientId = ref('')
 const patientInfo = ref({
   name: '',
   gender: '',
@@ -259,6 +260,8 @@ const formData = ref({
   bloodPressure: '',
   pulse: ''
 })
+
+const isSubmitted = ref(false)
 
 // 添加诊断项
 const addDiagnosis = (type) => {
@@ -381,35 +384,59 @@ const validateForm = () => {
   return true
 }
 
-// 提交表单
-const handleSubmit = () => {
-  if (!validateForm()) return
-  
-  // TODO: 提交表单逻辑
-  console.log('提交表单:', formData.value)
-  uni.showToast({
-    title: '提交成功',
-    icon: 'success'
-  })
-}
-
 // 跳转到处方页面
 const goToPrescription = () => {
+  if (!isSubmitted.value) {
+    uni.showModal({
+      title: '提示',
+      content: '请先提交病历后再开具处方',
+      showCancel: false
+    })
+    return
+  }
   uni.navigateTo({
-    url: '/pages/prescription/index'
+    url: `/pages/prescription/index?patientId=${patientId.value}`
   })
 }
 
 // 跳转到检验检查页面
 const goToInspection = () => {
+  if (!isSubmitted.value) {
+    uni.showModal({
+      title: '提示',
+      content: '请先提交病历后再开具检验检查',
+      showCancel: false
+    })
+    return
+  }
   uni.navigateTo({
-    url: '/pages/inspection/index'
+    url: `/pages/inspection/index?patientId=${patientId.value}`
   })
+}
+
+// 提交表单
+const handleSubmit = () => {
+  if (!validateForm()) return
+  
+  // TODO: 提交表单逻辑
+  uni.showLoading({
+    title: '提交中...'
+  })
+  
+  setTimeout(() => {
+    uni.hideLoading()
+    isSubmitted.value = true
+    uni.showToast({
+      title: '提交成功',
+      icon: 'success'
+    })
+  }, 1500)
 }
 
 onMounted(() => {
   // 获取患者信息
   const query = uni.getStorageSync('patient_query') || {}
+  patientId.value = query.patientId || ''
   patientInfo.value = {
     name: query.name || '张三',  // 测试数据
     gender: query.gender || '男',
